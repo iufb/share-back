@@ -3,9 +3,6 @@ import { User } from '@prisma/client';
 import { Exclude } from 'class-transformer';
 
 export class UserEntity implements User {
-  constructor(partial: Partial<UserEntity>) {
-    Object.assign(this, partial);
-  }
   @ApiProperty()
   id: number;
   @ApiProperty()
@@ -15,8 +12,14 @@ export class UserEntity implements User {
 
   @Exclude()
   password: string;
-  @ApiProperty({ required: false, nullable: true })
+
+  @Exclude()
   refreshToken: string | null;
+
   @ApiProperty()
   createdAt: Date;
+
+  constructor(partial: Partial<UserEntity>) {
+    Object.assign(this, partial);
+  }
 }

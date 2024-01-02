@@ -13,6 +13,7 @@ import { AuthDto } from './dto/auth.dto';
 import { AuthService } from './auth.service';
 import { AccessTokenGuard } from 'src/auth/guards/accessToken.guard';
 import { RefreshTokenGuard } from 'src/auth/guards/refreshToken.guard';
+import { ApiTags } from '@nestjs/swagger';
 
 const MAX_AGE = 7 * 24 * 60 * 60 * 1000;
 const updateRefreshToken = ({
@@ -29,7 +30,7 @@ const updateRefreshToken = ({
     maxAge: isLogout ? 0 : MAX_AGE,
   });
 };
-
+@ApiTags('auth')
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}

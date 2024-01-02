@@ -8,6 +8,8 @@ import {
   Delete,
   ParseIntPipe,
   NotFoundException,
+  ClassSerializerInterceptor,
+  UseInterceptors,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -17,6 +19,7 @@ import { UserEntity } from './entities/user.entity';
 import { USER_NOT_FOUND } from 'src/users/users.constants';
 
 @ApiTags('Users')
+@UseInterceptors(ClassSerializerInterceptor)
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
@@ -27,6 +30,7 @@ export class UsersController {
     return new UserEntity(await this.usersService.create(createUserDto));
   }
 
+  @UseInterceptors(ClassSerializerInterceptor)
   @Get()
   @ApiOkResponse({ type: UserEntity, isArray: true })
   async findAll() {
@@ -37,6 +41,7 @@ export class UsersController {
     return users.map((user) => new UserEntity(user));
   }
 
+  @UseInterceptors(ClassSerializerInterceptor)
   @Get(':id')
   @ApiOkResponse({ type: UserEntity })
   async findOne(@Param('id', ParseIntPipe) id: number) {
