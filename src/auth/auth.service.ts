@@ -30,17 +30,21 @@ export class AuthService {
       ...createUserDto,
       password: passwordHash,
     });
-    const tokens = await this.getTokens(newUser.id, newUser.email);
+    const tokens = await this.getTokens(
+      newUser.id,
+      newUser.email,
+      newUser.username,
+    );
     await this.updateRefreshToken(newUser.id, tokens.refreshToken);
     return tokens;
   }
 
   async signIn(authDto: AuthDto) {
-    const { userId, email } = await this.validateUser(
+    const { userId, email, username } = await this.validateUser(
       authDto.email,
       authDto.password,
     );
-    const tokens = await this.getTokens(userId, email);
+    const tokens = await this.getTokens(userId, email, username);
     await this.updateRefreshToken(userId, tokens.refreshToken);
     return tokens;
   }
@@ -58,7 +62,7 @@ export class AuthService {
     if (!isValidPassword) {
       throw new UnauthorizedException(WRONG_PASSWORD);
     }
-    return { userId: user.id, email };
+    return { userId: user.id, email, username: user.username };
   }
   async hashData(data: string) {
     const salt = await genSalt(10);
@@ -70,10 +74,10 @@ export class AuthService {
       refreshToken: hashedRefreshToken,
     });
   }
-  async getTokens(userId: number, email: string) {
+  async getTokens(userId: number, email: string, username: string) {
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(
-        { sub: userId, email },
+        { sub: { userId, email, username } },
         {
           secret: this.configService.get<string>('JWT_ACCESS_SECRET'),
           expiresIn: '1d',
@@ -96,7 +100,7 @@ export class AuthService {
     }
     const refreshTokenMatches = await compare(refreshToken, user.refreshToken);
     if (!refreshTokenMatches) throw new ForbiddenException(ACCESS_DENIED);
-    const tokens = await this.getTokens(userId, user.email);
+    const tokens = await this.getTokens(userId, user.email, user.username);
     await this.updateRefreshToken(userId, tokens.refreshToken);
     return tokens.accessToken;
   }

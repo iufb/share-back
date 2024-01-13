@@ -8,7 +8,13 @@ import { AuthModule } from './auth/auth.module';
 import { PostsModule } from './posts/posts.module';
 
 @Module({
-  imports: [ConfigModule.forRoot(), PrismaModule, UsersModule, AuthModule, PostsModule],
+  imports: [
+    ConfigModule.forRoot(),
+    PrismaModule,
+    UsersModule,
+    AuthModule,
+    PostsModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })

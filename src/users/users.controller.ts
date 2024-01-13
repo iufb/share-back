@@ -1,23 +1,23 @@
 import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-  ParseIntPipe,
-  NotFoundException,
-  ClassSerializerInterceptor,
-  UseInterceptors,
+        Body,
+        ClassSerializerInterceptor,
+        Controller,
+        Delete,
+        Get,
+        NotFoundException,
+        Param,
+        ParseIntPipe,
+        Patch,
+        Post,
+        UseInterceptors,
 } from '@nestjs/common';
-import { UsersService } from './users.service';
+import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { getExceptionMessage } from 'src/utils/exception-message';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { UserEntity } from './entities/user.entity';
-import { USER_NOT_FOUND } from 'src/users/users.constants';
-
+import { UsersService } from './users.service';
+const USER_NOT_FOUND = getExceptionMessage(404, 'User/users');
 @ApiTags('Users')
 @UseInterceptors(ClassSerializerInterceptor)
 @Controller('users')

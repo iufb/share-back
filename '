@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  ClassSerializerInterceptor,
+  Injectable,
+  UseInterceptors,
+} from '@nestjs/common';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -10,9 +14,7 @@ export class PostsService {
 
   create(createPostDto: CreatePostDto, files: Express.Multer.File[]) {
     // console.log(files);
-    console.log(createPostDto, '>> THERE>>');
-    console.log(files);
-
+    console.log(createPostDto), '>> THERE>>');
     //
     // return this.prisma.post.create({ data: createPostDto });
     return {};
