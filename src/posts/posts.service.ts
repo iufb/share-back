@@ -2,25 +2,21 @@ import { Injectable } from '@nestjs/common';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { PostEntity } from './entities/post.entity';
 
 @Injectable()
 export class PostsService {
   constructor(private prisma: PrismaService) {}
 
-  create(createPostDto: CreatePostDto, files: Express.Multer.File[]) {
-    // console.log(files);
-    console.log(createPostDto, '>> THERE>>');
-    console.log(files);
-
-    //
-    // return this.prisma.post.create({ data: createPostDto });
-    return {};
+  create(createPostDto: CreatePostDto, files: string[]) {
+    return this.prisma.post.create({
+      data: { ...createPostDto, images: files },
+    });
   }
 
   async findAll() {
     return this.prisma.post.findMany({
       include: { author: true },
+      orderBy: [{ createdAt: 'desc' }],
     });
   }
 

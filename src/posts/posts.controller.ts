@@ -24,6 +24,7 @@ import { PostEntity } from './entities/post.entity';
 import { getExceptionMessage } from 'src/utils/exception-message';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { MultipartBodyTransformPipe } from 'src/pipes/multipart-transform.pipe';
+import { SharpPipe } from 'src/pipes/sharp.pipe';
 const POST_NOT_FOUND = getExceptionMessage(404, 'Post/posts');
 @Controller('posts')
 export class PostsController {
@@ -37,7 +38,7 @@ export class PostsController {
     @Req() req: Request,
     @Body()
     createPostDto: CreatePostDto,
-    @UploadedFiles() files: Express.Multer.File[],
+    @UploadedFiles(SharpPipe) files: string[],
   ) {
     return new PostEntity(await this.postsService.create(createPostDto, files));
   }
@@ -50,12 +51,7 @@ export class PostsController {
     if (posts.length == 0) {
       return [];
     }
-    // return posts.map((post) => new PostEntity(post));
-    return new Promise((resolve) =>
-      setTimeout(() => {
-        resolve(posts.map((post) => new PostEntity(post)));
-      }, 5000),
-    ).then((data) => data);
+    return posts.map((post) => new PostEntity(post));
   }
 
   @UseInterceptors(ClassSerializerInterceptor)

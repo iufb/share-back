@@ -26,8 +26,10 @@ model User {
 model Post {
   id       Int       @id @default(autoincrement())
   content  String
+  createdAt DateTime  @default(now())
   author   User      @relation(fields: [authorId], references: [id])
   authorId Int
+  images  String[]
   comments Comment[]
   likes    Like[]
 }

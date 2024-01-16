@@ -10,6 +10,8 @@ export class PostEntity {
   authorId: number;
   @ApiProperty({ required: false, type: UserEntity })
   author?: UserEntity;
+  @ApiProperty()
+  images: string[];
 
   constructor({ author, ...data }: Partial<PostEntity>) {
     Object.assign(this, data);
