@@ -1,15 +1,19 @@
 import {
-        Body,
-        ClassSerializerInterceptor,
-        Controller,
-        Delete,
-        Get,
-        NotFoundException,
-        Param,
-        ParseIntPipe,
-        Patch,
-        Post,
-        UseInterceptors,
+  Body,
+  ClassSerializerInterceptor,
+  Controller,
+  Delete,
+  Get,
+  NotFoundException,
+  Param,
+  ParseIntPipe,
+  Patch,
+  Post,
+  UploadedFile,
+  UploadedFiles,
+  UseInterceptors,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
 import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { getExceptionMessage } from 'src/utils/exception-message';
@@ -17,6 +21,13 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserEntity } from './entities/user.entity';
 import { UsersService } from './users.service';
+import { MultipartBodyTransformPipe } from 'src/pipes/multipart-transform.pipe';
+import {
+  FileFieldsInterceptor,
+  FileInterceptor,
+  FilesInterceptor,
+} from '@nestjs/platform-express';
+import { SharpPipe } from 'src/pipes/sharp.pipe';
 const USER_NOT_FOUND = getExceptionMessage(404, 'User/users');
 @ApiTags('Users')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -52,13 +63,25 @@ export class UsersController {
     return new UserEntity(user);
   }
 
-  @Patch(':id')
+  @UsePipes(new MultipartBodyTransformPipe('user'), new ValidationPipe())
+  @UseInterceptors(
+    ClassSerializerInterceptor,
+    FileFieldsInterceptor([
+      { name: 'avatar', maxCount: 1 },
+      { name: 'cover', maxCount: 1 },
+    ]),
+  )
   @ApiOkResponse({ type: UserEntity })
-  update(
+  @Patch(':id')
+  async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateUserDto: UpdateUserDto,
+    @UploadedFiles(SharpPipe)
+    { avatar, cover }: { avatar: string; cover: string },
   ) {
-    return this.usersService.update(id, updateUserDto);
+    return new UserEntity(
+      await this.usersService.update(id, updateUserDto, avatar, cover),
+    );
   }
 
   @Delete(':id')

@@ -13,6 +13,9 @@ export class PostEntity {
   @ApiProperty()
   images: string[];
 
+  @ApiProperty()
+  isLiked: boolean;
+
   constructor({ author, ...data }: Partial<PostEntity>) {
     Object.assign(this, data);
     if (author) {

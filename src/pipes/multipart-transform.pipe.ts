@@ -14,7 +14,8 @@ export class MultipartBodyTransformPipe implements PipeTransform {
   }
   transform(value: any, metadata: ArgumentMetadata) {
     if (metadata.type !== 'body') return value;
-    if (metadata.type == 'body') {
+    if (metadata.type === 'body') {
+      if (!value[this.key]) return value;
       try {
         return JSON.parse(value[this.key]);
       } catch (e) {

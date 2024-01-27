@@ -40,12 +40,12 @@ export class AuthService {
   }
 
   async signIn(authDto: AuthDto) {
-    const { userId, email, username } = await this.validateUser(
+    const { id, email, username } = await this.validateUser(
       authDto.email,
       authDto.password,
     );
-    const tokens = await this.getTokens(userId, email, username);
-    await this.updateRefreshToken(userId, tokens.refreshToken);
+    const tokens = await this.getTokens(id, email, username);
+    await this.updateRefreshToken(id, tokens.refreshToken);
     return tokens;
   }
 
@@ -62,7 +62,7 @@ export class AuthService {
     if (!isValidPassword) {
       throw new UnauthorizedException(WRONG_PASSWORD);
     }
-    return { userId: user.id, email, username: user.username };
+    return { id: user.id, email, username: user.username };
   }
   async hashData(data: string) {
     const salt = await genSalt(10);
@@ -77,14 +77,14 @@ export class AuthService {
   async getTokens(userId: number, email: string, username: string) {
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(
-        { sub: { userId, email, username } },
+        { sub: { id: userId, email, username } },
         {
           secret: this.configService.get<string>('JWT_ACCESS_SECRET'),
           expiresIn: '1d',
         },
       ),
       this.jwtService.signAsync(
-        { sub: userId, email },
+        { sub: { id: userId, email } },
         {
           secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
           expiresIn: '7d',

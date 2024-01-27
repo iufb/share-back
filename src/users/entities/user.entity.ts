@@ -19,6 +19,15 @@ export class UserEntity implements User {
   @ApiProperty()
   createdAt: Date;
 
+  @ApiProperty()
+  cover: string;
+
+  @ApiProperty()
+  avatar: string;
+
+  @ApiProperty()
+  bio: string;
+
   constructor(partial: Partial<UserEntity>) {
     Object.assign(this, partial);
   }

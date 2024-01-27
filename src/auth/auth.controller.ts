@@ -1,11 +1,13 @@
 import {
   Body,
+  ClassSerializerInterceptor,
   Controller,
   Get,
   Post,
   Req,
   Res,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
@@ -14,6 +16,8 @@ import { AuthService } from './auth.service';
 import { AccessTokenGuard } from 'src/auth/guards/accessToken.guard';
 import { RefreshTokenGuard } from 'src/auth/guards/refreshToken.guard';
 import { ApiTags } from '@nestjs/swagger';
+import { UsersService } from 'src/users/users.service';
+import { UserEntity } from 'src/users/entities/user.entity';
 
 const getMaxAge = (value: number) => value * 24 * 60 * 60 * 1000;
 const updateRefreshToken = ({
@@ -33,7 +37,10 @@ const updateRefreshToken = ({
 @ApiTags('auth')
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(
+    private authService: AuthService,
+    private userService: UsersService,
+  ) {}
 
   @Post('signup')
   async signup(
@@ -70,11 +77,12 @@ export class AuthController {
     return response.send({ logout: true });
   }
 
+  @UseInterceptors(ClassSerializerInterceptor)
   @UseGuards(AccessTokenGuard)
   @Get('session')
   async getSession(@Req() req: Request) {
-    const user = req.user['sub'];
-    return user;
+    const userId = req.user['sub'].id;
+    return new UserEntity(await this.userService.findById(userId));
   }
 
   @UseGuards(RefreshTokenGuard)

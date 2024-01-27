@@ -16,8 +16,7 @@ export class CreateUserDto {
   @MaxLength(12)
   password: string;
 
-  @ApiProperty()
   @IsString()
   @IsOptional()
-  refreshToken: string;
+  refreshToken?: string;
 }

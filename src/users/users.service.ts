@@ -27,9 +27,17 @@ export class UsersService {
   findById(id: number) {
     return this.prisma.user.findUnique({ where: { id } });
   }
-
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return this.prisma.user.update({ where: { id }, data: updateUserDto });
+  //TODO!!!!
+  update(
+    id: number,
+    updateUserDto: UpdateUserDto,
+    avatar?: string,
+    cover?: string,
+  ) {
+    return this.prisma.user.update({
+      where: { id },
+      data: { ...updateUserDto, avatar, cover },
+    });
   }
 
   remove(id: number) {

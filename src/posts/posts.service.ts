@@ -13,15 +13,32 @@ export class PostsService {
     });
   }
 
-  async findAll() {
-    return this.prisma.post.findMany({
-      include: { author: true },
+  async findAll(userId: number) {
+    const posts = await this.prisma.post.findMany({
+      include: { author: true, likes: true },
       orderBy: [{ createdAt: 'desc' }],
+    });
+    return posts.map((post) => {
+      const isLiked = !!post.likes.find((like) => like.userId === userId);
+      return {
+        ...post,
+        isLiked: isLiked,
+        likesCount: post.likes.length,
+      };
     });
   }
 
-  async findOne(id: number) {
-    return this.prisma.post.findUnique({ where: { id } });
+  async findOne(id: number, userId: number) {
+    const post = await this.prisma.post.findUnique({
+      where: { id },
+      include: { likes: true, author: true },
+    });
+    const isLiked = !!post.likes.find((like) => like.userId === userId);
+    return {
+      ...post,
+      isLiked: isLiked,
+      likesCount: post.likes.length,
+    };
   }
 
   update(id: number, updatePostDto: UpdatePostDto) {

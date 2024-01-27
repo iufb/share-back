@@ -25,6 +25,7 @@ import { getExceptionMessage } from 'src/utils/exception-message';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { MultipartBodyTransformPipe } from 'src/pipes/multipart-transform.pipe';
 import { SharpPipe } from 'src/pipes/sharp.pipe';
+import { Request } from 'express';
 const POST_NOT_FOUND = getExceptionMessage(404, 'Post/posts');
 @Controller('posts')
 export class PostsController {
@@ -46,18 +47,21 @@ export class PostsController {
   @UseInterceptors(ClassSerializerInterceptor)
   @UseGuards(AccessTokenGuard)
   @Get()
-  async findAll() {
-    const posts = await this.postsService.findAll();
+  async findAll(@Req() req: Request) {
+    const userId = req.user['sub'].id;
+    const posts = await this.postsService.findAll(userId);
     if (posts.length == 0) {
       return [];
     }
     return posts.map((post) => new PostEntity(post));
   }
 
+  @UseGuards(AccessTokenGuard)
   @UseInterceptors(ClassSerializerInterceptor)
   @Get(':id')
-  async findOne(@Param('id', ParseIntPipe) id: number) {
-    const post = await this.postsService.findOne(id);
+  async findOne(@Param('id', ParseIntPipe) id: number, @Req() req: Request) {
+    const userId = req.user['sub'].id;
+    const post = await this.postsService.findOne(id, userId);
     if (!post) {
       throw new NotFoundException(POST_NOT_FOUND);
     }

@@ -8,6 +8,7 @@ import { AuthModule } from './auth/auth.module';
 import { PostsModule } from './posts/posts.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { path } from 'app-root-path';
+import { LikesModule } from './likes/likes.module';
 
 console.log(`${path}/uploads`);
 @Module({
@@ -20,6 +21,7 @@ console.log(`${path}/uploads`);
     UsersModule,
     AuthModule,
     PostsModule,
+    LikesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
