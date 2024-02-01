@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Exclude } from 'class-transformer';
 import { UserEntity } from 'src/users/entities/user.entity';
 
 export class PostEntity {
@@ -12,14 +13,39 @@ export class PostEntity {
   author?: UserEntity;
   @ApiProperty()
   images: string[];
-
   @ApiProperty()
-  isLiked: boolean;
+  sourceId?: number;
+  @ApiProperty()
+  source?: PostEntity;
+  @ApiProperty()
+  childPosts?: PostEntity[];
+  @ApiProperty()
+  isLiked?: boolean;
+  @Exclude()
+  likes?: { userId: number; postId: number }[];
 
-  constructor({ author, ...data }: Partial<PostEntity>) {
+  constructor({
+    userId,
+    post,
+  }: {
+    userId?: number;
+    post: Partial<PostEntity>;
+  }) {
+    const { author, likes, source, childPosts, ...data } = post;
     Object.assign(this, data);
     if (author) {
       this.author = new UserEntity(author);
+    }
+    if (userId) {
+      this.isLiked = !!likes.find((like) => like.userId === userId);
+    }
+    if (source) {
+      this.source = new PostEntity({ post: source });
+    }
+    if (childPosts) {
+      this.childPosts = childPosts.map(
+        (post) => new PostEntity({ userId, post }),
+      );
     }
   }
 }

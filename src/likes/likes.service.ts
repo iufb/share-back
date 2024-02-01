@@ -13,10 +13,6 @@ export class LikesService {
       return this.prisma.postLike.create({
         data: { userId, postId: sourceId },
       });
-    } else {
-      return this.prisma.commentLike.create({
-        data: { userId, commentId: sourceId },
-      });
     }
   }
 
@@ -37,12 +33,6 @@ export class LikesService {
       return this.prisma.postLike.delete({
         where: {
           postLikeId: { postId: sourceId, userId },
-        },
-      });
-    } else {
-      return this.prisma.commentLike.delete({
-        where: {
-          commentLikeId: { commentId: sourceId, userId },
         },
       });
     }

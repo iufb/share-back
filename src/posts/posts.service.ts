@@ -13,32 +13,38 @@ export class PostsService {
     });
   }
 
-  async findAll(userId: number) {
+  async findAll() {
     const posts = await this.prisma.post.findMany({
-      include: { author: true, likes: true },
+      include: {
+        author: true,
+        likes: true,
+        source: { include: { author: true, likes: true } },
+        childPosts: {
+          include: {
+            likes: true,
+            author: true,
+            childPosts: true,
+            source: true,
+          },
+        },
+      },
       orderBy: [{ createdAt: 'desc' }],
     });
-    return posts.map((post) => {
-      const isLiked = !!post.likes.find((like) => like.userId === userId);
-      return {
-        ...post,
-        isLiked: isLiked,
-        likesCount: post.likes.length,
-      };
-    });
+    return posts;
   }
 
-  async findOne(id: number, userId: number) {
-    const post = await this.prisma.post.findUnique({
+  async findOne(id: number) {
+    return this.prisma.post.findUnique({
       where: { id },
-      include: { likes: true, author: true },
+      include: {
+        likes: true,
+        author: true,
+        source: { include: { author: true, likes: true } },
+        childPosts: {
+          include: { author: true, likes: true, childPosts: true },
+        },
+      },
     });
-    const isLiked = !!post.likes.find((like) => like.userId === userId);
-    return {
-      ...post,
-      isLiked: isLiked,
-      likesCount: post.likes.length,
-    };
   }
 
   update(id: number, updatePostDto: UpdatePostDto) {

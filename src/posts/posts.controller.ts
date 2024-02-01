@@ -41,7 +41,8 @@ export class PostsController {
     createPostDto: CreatePostDto,
     @UploadedFiles(SharpPipe) files: string[],
   ) {
-    return new PostEntity(await this.postsService.create(createPostDto, files));
+    const post = await this.postsService.create(createPostDto, files);
+    return new PostEntity({ post });
   }
 
   @UseInterceptors(ClassSerializerInterceptor)
@@ -49,11 +50,11 @@ export class PostsController {
   @Get()
   async findAll(@Req() req: Request) {
     const userId = req.user['sub'].id;
-    const posts = await this.postsService.findAll(userId);
+    const posts = await this.postsService.findAll();
     if (posts.length == 0) {
       return [];
     }
-    return posts.map((post) => new PostEntity(post));
+    return posts.map((post) => new PostEntity({ userId, post }));
   }
 
   @UseGuards(AccessTokenGuard)
@@ -61,11 +62,11 @@ export class PostsController {
   @Get(':id')
   async findOne(@Param('id', ParseIntPipe) id: number, @Req() req: Request) {
     const userId = req.user['sub'].id;
-    const post = await this.postsService.findOne(id, userId);
+    const post = await this.postsService.findOne(id);
     if (!post) {
       throw new NotFoundException(POST_NOT_FOUND);
     }
-    return new PostEntity(post);
+    return new PostEntity({ userId, post });
   }
 
   @Patch(':id')
