@@ -37,7 +37,11 @@ export class PostEntity {
       this.author = new UserEntity(author);
     }
     if (userId) {
-      this.isLiked = !!likes.find((like) => like.userId === userId);
+      if (!likes) {
+        this.isLiked = false;
+      } else {
+        this.isLiked = !!likes.find((like) => like.userId === userId);
+      }
     }
     if (source) {
       this.source = new PostEntity({ post: source });

@@ -15,6 +15,7 @@ export class PostsService {
 
   async findAll() {
     const posts = await this.prisma.post.findMany({
+      where: { sourceId: null },
       include: {
         author: true,
         likes: true,

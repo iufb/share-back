@@ -66,6 +66,7 @@ export class PostsController {
     if (!post) {
       throw new NotFoundException(POST_NOT_FOUND);
     }
+
     return new PostEntity({ userId, post });
   }
 
