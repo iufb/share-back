@@ -21,6 +21,9 @@ export class PostEntity {
   childPosts?: PostEntity[];
   @ApiProperty()
   isLiked?: boolean;
+  @ApiProperty()
+  likesCount?: number;
+
   @Exclude()
   likes?: { userId: number; postId: number }[];
 
@@ -41,6 +44,7 @@ export class PostEntity {
         this.isLiked = false;
       } else {
         this.isLiked = !!likes.find((like) => like.userId === userId);
+        this.likesCount = likes.length;
       }
     }
     if (source) {

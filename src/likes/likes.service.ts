@@ -6,14 +6,11 @@ import { PrismaService } from 'src/prisma/prisma.service';
 @Injectable()
 export class LikesService {
   constructor(private prisma: PrismaService) {}
-  create(createLikeDto: CreateLikeDto, userId: number) {
-    const { sourceId, likeFor } = createLikeDto;
-    console.log(userId, sourceId, likeFor);
-    if (likeFor === 'post') {
-      return this.prisma.postLike.create({
-        data: { userId, postId: sourceId },
-      });
-    }
+  create({ sourceId }: CreateLikeDto, userId: number) {
+    //TODO check if like exists
+    return this.prisma.postLike.create({
+      data: { userId, postId: sourceId },
+    });
   }
 
   findAll() {
@@ -28,13 +25,11 @@ export class LikesService {
     return `This action updates a #${id} like`;
   }
 
-  remove(userId: number, sourceId: number, likeFor: 'comment' | 'post') {
-    if (likeFor === 'post') {
-      return this.prisma.postLike.delete({
-        where: {
-          postLikeId: { postId: sourceId, userId },
-        },
-      });
-    }
+  remove(userId: number, sourceId: number) {
+    return this.prisma.postLike.delete({
+      where: {
+        postLikeId: { postId: sourceId, userId },
+      },
+    });
   }
 }

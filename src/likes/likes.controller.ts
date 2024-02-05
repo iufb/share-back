@@ -9,10 +9,9 @@ import {
   UseGuards,
   Req,
   ParseIntPipe,
-  Query,
 } from '@nestjs/common';
 import { LikesService } from './likes.service';
-import { CreateLikeDto, LikeFor } from './dto/create-like.dto';
+import { CreateLikeDto } from './dto/create-like.dto';
 import { UpdateLikeDto } from './dto/update-like.dto';
 import { AccessTokenGuard } from 'src/auth/guards/accessToken.guard';
 import { Request } from 'express';
@@ -45,14 +44,9 @@ export class LikesController {
 
   @UseGuards(AccessTokenGuard)
   @Delete(':id')
-  remove(
-    @Param('id', ParseIntPipe) id: number,
-    @Req() req: Request,
-    @Query() { likeFor }: { likeFor: LikeFor },
-  ) {
+  remove(@Param('id', ParseIntPipe) id: number, @Req() req: Request) {
     const userId = req.user['sub'].id;
-    console.log(likeFor, userId, id);
 
-    return this.likesService.remove(userId, id, likeFor);
+    return this.likesService.remove(userId, id);
   }
 }
