@@ -23,6 +23,8 @@ export class PostEntity {
   isLiked?: boolean;
   @ApiProperty()
   likesCount?: number;
+  @ApiProperty()
+  repliesCount?: number;
 
   @Exclude()
   likes?: { userId: number; postId: number }[];
@@ -54,6 +56,7 @@ export class PostEntity {
       this.childPosts = childPosts.map(
         (post) => new PostEntity({ userId, post }),
       );
+      this.repliesCount = childPosts.length;
     }
   }
 }
