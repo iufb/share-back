@@ -73,7 +73,9 @@ export class AuthController {
   @Get('logout')
   async logout(@Req() req: Request, @Res() response: Response) {
     updateRefreshToken({ response, refreshToken: '', isLogout: true });
-    await this.authService.logout(req.user['sub']);
+    response.clearCookie('accessToken');
+    response.clearCookie('refreshToken');
+    await this.authService.logout(req.user['sub'].id);
     return response.send({ logout: true });
   }
 
