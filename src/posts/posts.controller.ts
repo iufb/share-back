@@ -70,6 +70,16 @@ export class PostsController {
     return new PostEntity({ userId, post });
   }
 
+  @UseGuards(AccessTokenGuard)
+  @Get('repostsCount/:id')
+  async getRepostsCount(
+    @Param('id', ParseIntPipe) id: number,
+    @Req() req: Request,
+  ) {
+    const userId = req.user['sub'].id;
+    return this.postsService.getRepostsCount(id, userId);
+  }
+
   @Patch(':id')
   update(
     @Param('id', ParseIntPipe) id: number,
@@ -80,6 +90,8 @@ export class PostsController {
 
   @Delete(':id')
   remove(@Param('id', ParseIntPipe) id: number) {
+    console.log(id);
+
     return this.postsService.remove(id);
   }
 }

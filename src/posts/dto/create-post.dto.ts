@@ -3,8 +3,9 @@ export class CreatePostDto {
   @IsNumber()
   @IsOptional()
   sourceId?: number;
+
   @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   content: string;
 
   @IsNumber()

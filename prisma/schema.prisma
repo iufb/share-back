@@ -24,9 +24,10 @@ model User {
 model Post {
   id        Int        @id @default(autoincrement())
   sourceId  Int?
-  source    Post?     @relation("source", fields: [sourceId], references: [id])
-  childPosts Post[]   @relation("source")
-  content   String
+  source    Post?     @relation("source", fields: [sourceId], references: [id], onDelete: Cascade)
+  isRepost  Boolean?
+  childPosts Post[]   @relation("source" )
+  content   String?
   authorId  Int
   images    String[]
   createdAt DateTime   @default(now())
@@ -42,3 +43,5 @@ model PostLike {
 
   @@id([userId, postId], name: "postLikeId")
 }
+
+
