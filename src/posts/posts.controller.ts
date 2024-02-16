@@ -77,6 +77,8 @@ export class PostsController {
     @Req() req: Request,
   ) {
     const userId = req.user['sub'].id;
+    console.log(id ? 'I have id' : 'I dont have id');
+
     return this.postsService.getRepostsCount(id, userId);
   }
 

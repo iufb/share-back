@@ -62,7 +62,7 @@ export class PostsService {
     return {
       count: reposts.length,
       isReposted: !!repostedPost,
-      repostId: repostedPost.id,
+      repostId: repostedPost?.id ?? null,
     };
   }
   update(id: number, updatePostDto: UpdatePostDto) {
