@@ -43,6 +43,7 @@ export class PostsService {
         author: true,
         source: { include: { author: true, likes: true } },
         childPosts: {
+          where: { isRepost: null },
           include: { author: true, likes: true, childPosts: true },
         },
       },
@@ -58,6 +59,7 @@ export class PostsService {
     const reposts = await this.findReposts(id);
     //convert -1 to false
     const repostedPost = reposts.find((repost) => repost.authorId === userId);
+    console.log(repostedPost);
 
     return {
       count: reposts.length,
