@@ -2,7 +2,22 @@ import { Injectable } from '@nestjs/common';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
-
+const includesProps = {
+  include: {
+    author: true,
+    likes: true,
+    source: { include: { author: true, likes: true } },
+    childPosts: {
+      where: { isRepost: null },
+      include: {
+        likes: true,
+        author: true,
+        childPosts: true,
+        source: true,
+      },
+    },
+  },
+};
 @Injectable()
 export class PostsService {
   constructor(private prisma: PrismaService) {}
@@ -16,20 +31,7 @@ export class PostsService {
   async findAll() {
     const posts = await this.prisma.post.findMany({
       where: { sourceId: null, isRepost: null },
-      include: {
-        author: true,
-        likes: true,
-        source: { include: { author: true, likes: true } },
-        childPosts: {
-          where: { isRepost: null },
-          include: {
-            likes: true,
-            author: true,
-            childPosts: true,
-            source: true,
-          },
-        },
-      },
+      ...includesProps,
       orderBy: [{ createdAt: 'desc' }],
     });
     return posts;
@@ -55,11 +57,31 @@ export class PostsService {
     });
     return reposts;
   }
+  async findLikedPosts(userId: number) {
+    const likedPosts = await this.prisma.post.findMany({
+      where: {
+        likes: {
+          some: {
+            userId: userId,
+          },
+        },
+      },
+      ...includesProps,
+    });
+
+    return likedPosts;
+  }
+  async getRepliesCount(id: number) {
+    const reply = await this.prisma.post.findUnique({
+      where: { id },
+      include: { childPosts: true },
+    });
+    return reply.childPosts.length;
+  }
   async getRepostsCount(id: number, userId: number) {
     const reposts = await this.findReposts(id);
     //convert -1 to false
     const repostedPost = reposts.find((repost) => repost.authorId === userId);
-    console.log(repostedPost);
 
     return {
       count: reposts.length,

@@ -59,6 +59,19 @@ export class PostsController {
 
   @UseGuards(AccessTokenGuard)
   @UseInterceptors(ClassSerializerInterceptor)
+  @Get('/liked')
+  async findLikedPosts(@Req() req: Request) {
+    const userId = req.user['sub'].id;
+    const posts = await this.postsService.findLikedPosts(userId);
+    if (posts.length === 0) {
+      throw new NotFoundException(POST_NOT_FOUND);
+    }
+
+    return posts.map((post) => new PostEntity({ userId, post }));
+    // return posts;
+  }
+  @UseGuards(AccessTokenGuard)
+  @UseInterceptors(ClassSerializerInterceptor)
   @Get(':id')
   async findOne(@Param('id', ParseIntPipe) id: number, @Req() req: Request) {
     const userId = req.user['sub'].id;
@@ -69,7 +82,11 @@ export class PostsController {
 
     return new PostEntity({ userId, post });
   }
-
+  @UseGuards(AccessTokenGuard)
+  @Get('repliesCount/:id')
+  async getRepliesCount(@Param('id', ParseIntPipe) id: number) {
+    return this.postsService.getRepliesCount(id);
+  }
   @UseGuards(AccessTokenGuard)
   @Get('repostsCount/:id')
   async getRepostsCount(
