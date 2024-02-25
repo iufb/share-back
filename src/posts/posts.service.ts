@@ -76,7 +76,7 @@ export class PostsService {
       where: { id },
       include: { childPosts: true },
     });
-    return reply.childPosts.length;
+    return { sourceId: id, count: reply.childPosts.length };
   }
   async getRepostsCount(id: number, userId: number) {
     const reposts = await this.findReposts(id);
