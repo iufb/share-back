@@ -67,10 +67,23 @@ export class PostsService {
         },
       },
       ...includesProps,
+      orderBy: [{ createdAt: 'desc' }],
     });
 
     return likedPosts;
   }
+  async findUserReplies(userId: number) {
+    const replies = await this.prisma.post.findMany({
+      where: {
+        authorId: userId,
+      },
+      ...includesProps,
+      orderBy: [{ createdAt: 'desc' }],
+    });
+
+    return replies;
+  }
+
   async getRepliesCount(id: number) {
     const reply = await this.prisma.post.findUnique({
       where: { id },

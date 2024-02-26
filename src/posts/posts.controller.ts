@@ -63,9 +63,16 @@ export class PostsController {
   async findLikedPosts(@Req() req: Request) {
     const userId = req.user['sub'].id;
     const posts = await this.postsService.findLikedPosts(userId);
-    if (posts.length === 0) {
-      throw new NotFoundException(POST_NOT_FOUND);
-    }
+
+    return posts.map((post) => new PostEntity({ userId, post }));
+    // return posts;
+  }
+  @UseGuards(AccessTokenGuard)
+  @UseInterceptors(ClassSerializerInterceptor)
+  @Get('/replies')
+  async findUserReplies(@Req() req: Request) {
+    const userId = req.user['sub'].id;
+    const posts = await this.postsService.findUserReplies(userId);
 
     return posts.map((post) => new PostEntity({ userId, post }));
     // return posts;
