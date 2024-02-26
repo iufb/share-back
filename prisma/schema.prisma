@@ -25,7 +25,8 @@ model Post {
   id        Int        @id @default(autoincrement())
   sourceId  Int?
   source    Post?     @relation("source", fields: [sourceId], references: [id], onDelete: Cascade)
-  isRepost  Boolean?
+  isRepost  Boolean   @default(false)
+  isReply   Boolean   @default(false)
   childPosts Post[]   @relation("source" )
   content   String?
   authorId  Int

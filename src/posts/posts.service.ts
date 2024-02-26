@@ -8,7 +8,7 @@ const includesProps = {
     likes: true,
     source: { include: { author: true, likes: true } },
     childPosts: {
-      where: { isRepost: null },
+      where: { isRepost: false },
       include: {
         likes: true,
         author: true,
@@ -30,7 +30,7 @@ export class PostsService {
 
   async findAll() {
     const posts = await this.prisma.post.findMany({
-      where: { sourceId: null, isRepost: null },
+      where: { sourceId: null, isRepost: false },
       ...includesProps,
       orderBy: [{ createdAt: 'desc' }],
     });
@@ -45,7 +45,7 @@ export class PostsService {
         author: true,
         source: { include: { author: true, likes: true } },
         childPosts: {
-          where: { isRepost: null },
+          where: { isRepost: false },
           include: { author: true, likes: true, childPosts: true },
         },
       },
@@ -76,6 +76,7 @@ export class PostsService {
     const replies = await this.prisma.post.findMany({
       where: {
         authorId: userId,
+        isReply: true,
       },
       ...includesProps,
       orderBy: [{ createdAt: 'desc' }],
@@ -83,13 +84,27 @@ export class PostsService {
 
     return replies;
   }
+  //FIX
+  async findUserPosts(userId: number) {
+    const postsAndReposts = await this.prisma.post.findMany({
+      where: {
+        authorId: userId,
+      },
+      ...includesProps,
+      orderBy: [{ createdAt: 'desc' }],
+    });
+    return postsAndReposts;
+  }
 
   async getRepliesCount(id: number) {
     const reply = await this.prisma.post.findUnique({
       where: { id },
       include: { childPosts: true },
     });
-    return { sourceId: id, count: reply.childPosts.length };
+    return {
+      sourceId: id,
+      count: reply.childPosts.filter((post) => post.isReply).length,
+    };
   }
   async getRepostsCount(id: number, userId: number) {
     const reposts = await this.findReposts(id);
