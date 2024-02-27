@@ -51,12 +51,6 @@ export class PostsService {
       },
     });
   }
-  async findReposts(id: number) {
-    const reposts = await this.prisma.post.findMany({
-      where: { sourceId: id, isRepost: true },
-    });
-    return reposts;
-  }
   async findLikedPosts(userId: number) {
     const likedPosts = await this.prisma.post.findMany({
       where: {
@@ -89,6 +83,7 @@ export class PostsService {
     const postsAndReposts = await this.prisma.post.findMany({
       where: {
         authorId: userId,
+        isReply: false,
       },
       ...includesProps,
       orderBy: [{ createdAt: 'desc' }],
@@ -106,6 +101,13 @@ export class PostsService {
       count: reply.childPosts.filter((post) => post.isReply).length,
     };
   }
+  async findReposts(id: number) {
+    const reposts = await this.prisma.post.findMany({
+      where: { sourceId: id, isRepost: true },
+    });
+    return reposts;
+  }
+
   async getRepostsCount(id: number, userId: number) {
     const reposts = await this.findReposts(id);
     //convert -1 to false
@@ -114,6 +116,7 @@ export class PostsService {
     return {
       count: reposts.length,
       isReposted: !!repostedPost,
+      sourceId: id,
       repostId: repostedPost?.id ?? null,
     };
   }
