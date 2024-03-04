@@ -2,11 +2,22 @@ import { Injectable } from '@nestjs/common';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
-const includesProps = {
+export const postIncludesProps = {
   include: {
     author: true,
-    likes: true,
-    source: { include: { author: true, likes: true } },
+    source: {
+      include: {
+        author: true,
+        likes: true,
+        bookmarks: true,
+        _count: {
+          select: {
+            bookmarks: true,
+            likes: true,
+          },
+        },
+      },
+    },
     childPosts: {
       where: { isRepost: false },
       include: {
@@ -14,6 +25,21 @@ const includesProps = {
         author: true,
         childPosts: true,
         source: true,
+        bookmarks: true,
+        _count: {
+          select: {
+            bookmarks: true,
+            likes: true,
+          },
+        },
+      },
+    },
+    likes: true,
+    bookmarks: true,
+    _count: {
+      select: {
+        bookmarks: true,
+        likes: true,
       },
     },
   },
@@ -31,9 +57,10 @@ export class PostsService {
   async findAll() {
     const posts = await this.prisma.post.findMany({
       where: { sourceId: null, isRepost: false },
-      ...includesProps,
+      ...postIncludesProps,
       orderBy: [{ createdAt: 'desc' }],
     });
+
     return posts;
   }
 
@@ -60,7 +87,7 @@ export class PostsService {
           },
         },
       },
-      ...includesProps,
+      ...postIncludesProps,
       orderBy: [{ createdAt: 'desc' }],
     });
 
@@ -72,7 +99,7 @@ export class PostsService {
         authorId: userId,
         isReply: true,
       },
-      ...includesProps,
+      ...postIncludesProps,
       orderBy: [{ createdAt: 'desc' }],
     });
 
@@ -85,7 +112,7 @@ export class PostsService {
         authorId: userId,
         isReply: false,
       },
-      ...includesProps,
+      ...postIncludesProps,
       orderBy: [{ createdAt: 'desc' }],
     });
     return postsAndReposts;

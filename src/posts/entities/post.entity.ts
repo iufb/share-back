@@ -22,12 +22,18 @@ export class PostEntity {
   @ApiProperty()
   isLiked?: boolean;
   @ApiProperty()
-  likesCount?: number;
-  @ApiProperty()
+  bookmarked?: boolean;
   repliesCount?: number;
 
+  @ApiProperty()
+  _count?: {
+    likes: number;
+    bookmarks: number;
+  };
   @Exclude()
   likes?: { userId: number; postId: number }[];
+  @Exclude()
+  bookmarks?: { userId: number; postId: number }[];
 
   constructor({
     userId,
@@ -36,7 +42,7 @@ export class PostEntity {
     userId?: number;
     post: Partial<PostEntity>;
   }) {
-    const { author, likes, source, childPosts, ...data } = post;
+    const { author, likes, bookmarks, source, childPosts, ...data } = post;
     Object.assign(this, data);
     if (author) {
       this.author = new UserEntity(author);
@@ -46,7 +52,13 @@ export class PostEntity {
         this.isLiked = false;
       } else {
         this.isLiked = !!likes.find((like) => like.userId === userId);
-        this.likesCount = likes.length;
+      }
+      console.log(bookmarks, data.id);
+
+      if (bookmarks.length == 0) {
+        this.bookmarked = false;
+      } else {
+        this.bookmarked = !!bookmarks.find((b) => b.userId === userId);
       }
     }
     if (source) {

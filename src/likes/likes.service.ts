@@ -7,7 +7,6 @@ import { PrismaService } from 'src/prisma/prisma.service';
 export class LikesService {
   constructor(private prisma: PrismaService) {}
   create({ sourceId }: CreateLikeDto, userId: number) {
-    //TODO check if like exists
     return this.prisma.postLike.create({
       data: { userId, postId: sourceId },
     });
