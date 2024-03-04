@@ -59,33 +59,39 @@ export class PostsController {
 
   @UseGuards(AccessTokenGuard)
   @UseInterceptors(ClassSerializerInterceptor)
-  @Get('/liked')
-  async findLikedPosts(@Req() req: Request) {
+  @Get('/liked/:id')
+  async findLikedPosts(
+    @Param('id', ParseIntPipe) id: number,
+    @Req() req: Request,
+  ) {
     const userId = req.user['sub'].id;
-    const posts = await this.postsService.findLikedPosts(userId);
+    const posts = await this.postsService.findLikedPosts(id);
 
     return posts.map((post) => new PostEntity({ userId, post }));
-    // return posts;
   }
   @UseGuards(AccessTokenGuard)
   @UseInterceptors(ClassSerializerInterceptor)
-  @Get('/replies')
-  async findUserReplies(@Req() req: Request) {
-    const userId = req.user['sub'].id;
-    const posts = await this.postsService.findUserReplies(userId);
+  @Get('/replies/:id')
+  async findUserReplies(
+    @Param('id', ParseIntPipe) id: number,
+    @Req() req: Request,
+  ) {
+    const posts = await this.postsService.findUserReplies(id);
 
+    const userId = req.user['sub'].id;
     return posts.map((post) => new PostEntity({ userId, post }));
-    // return posts;
   }
   @UseGuards(AccessTokenGuard)
   @UseInterceptors(ClassSerializerInterceptor)
-  @Get('/user')
-  async findUserPosts(@Req() req: Request) {
-    const userId = req.user['sub'].id;
-    const posts = await this.postsService.findUserPosts(userId);
+  @Get('/user/:id')
+  async findUserPosts(
+    @Param('id', ParseIntPipe) id: number,
+    @Req() req: Request,
+  ) {
+    const posts = await this.postsService.findUserPosts(id);
 
+    const userId = req.user['sub'].id;
     return posts.map((post) => new PostEntity({ userId, post }));
-    // return posts;
   }
 
   @UseGuards(AccessTokenGuard)
