@@ -9,25 +9,23 @@ import {
   ParseIntPipe,
   Patch,
   Post,
-  UploadedFile,
   UploadedFiles,
+  UseGuards,
   UseInterceptors,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
+import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { MultipartBodyTransformPipe } from 'src/pipes/multipart-transform.pipe';
+import { SharpPipe } from 'src/pipes/sharp.pipe';
 import { getExceptionMessage } from 'src/utils/exception-message';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserEntity } from './entities/user.entity';
 import { UsersService } from './users.service';
-import { MultipartBodyTransformPipe } from 'src/pipes/multipart-transform.pipe';
-import {
-  FileFieldsInterceptor,
-  FileInterceptor,
-  FilesInterceptor,
-} from '@nestjs/platform-express';
-import { SharpPipe } from 'src/pipes/sharp.pipe';
+import { CreateFollowDto } from 'src/users/dto/create-follow.dto';
+import { AccessTokenGuard } from 'src/auth/guards/accessToken.guard';
 const USER_NOT_FOUND = getExceptionMessage(404, 'User/users');
 @ApiTags('Users')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -39,6 +37,11 @@ export class UsersController {
   @ApiCreatedResponse({ type: UserEntity })
   async create(@Body() createUserDto: CreateUserDto) {
     return new UserEntity(await this.usersService.create(createUserDto));
+  }
+  @UseGuards(AccessTokenGuard)
+  @Post()
+  async follow(@Body() createFollowDto: CreateFollowDto) {
+    return this.usersService.createFollow(createFollowDto);
   }
 
   @UseInterceptors(ClassSerializerInterceptor)

@@ -118,7 +118,6 @@ export class PostsController {
     @Req() req: Request,
   ) {
     const userId = req.user['sub'].id;
-    console.log(id ? 'I have id' : 'I dont have id');
 
     return this.postsService.getRepostsCount(id, userId);
   }
@@ -131,10 +130,10 @@ export class PostsController {
     return this.postsService.update(id, updatePostDto);
   }
 
+  @UseGuards(AccessTokenGuard)
   @Delete(':id')
-  remove(@Param('id', ParseIntPipe) id: number) {
-    console.log(id);
-
-    return this.postsService.remove(id);
+  remove(@Param('id', ParseIntPipe) id: number, @Req() req: Request) {
+    const userId = req.user['sub'].id;
+    return this.postsService.remove(id, userId);
   }
 }

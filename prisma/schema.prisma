@@ -20,6 +20,7 @@ model User {
   postLikes    PostLike[]
   bookmarks    Bookmark[]
   posts        Post[]
+  follows      Follow[]
 }
 
 model Post {
@@ -54,5 +55,11 @@ model Bookmark {
     user   User  @relation(fields: [userId], references: [id])
 
     @@id([userId, postId] , name: "bookmarkId")
+}
+model Follow{
+    followTo User @relation(fields: [followToId], references: [id])
+    followById Int 
+    followToId Int
+  @@id([followById,followToId], name: "followId")
 }
 

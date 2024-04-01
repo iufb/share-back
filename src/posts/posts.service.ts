@@ -67,15 +67,17 @@ export class PostsService {
   async findOne(id: number) {
     return this.prisma.post.findUnique({
       where: { id },
-      include: {
-        likes: true,
-        author: true,
-        source: { include: { author: true, likes: true } },
-        childPosts: {
-          where: { isRepost: false },
-          include: { author: true, likes: true, childPosts: true },
-        },
-      },
+
+      ...postIncludesProps,
+      // include: {
+      // likes: true,
+      // author: true,
+      // source: { include: { author: true, likes: true } },
+      // childPosts: {
+      //   where: { isRepost: false },
+      //   include: { author: true, likes: true, childPosts: true },
+      // },
+      //},
     });
   }
   async findLikedPosts(userId: number) {
@@ -151,7 +153,9 @@ export class PostsService {
     return `This action updates a #${id} post`;
   }
 
-  async remove(id: number) {
-    return this.prisma.post.delete({ where: { id } });
+  async remove(id: number, userId: number) {
+    return this.prisma.post.delete({
+      where: { id, isRepost: true, authorId: userId },
+    });
   }
 }

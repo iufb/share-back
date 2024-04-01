@@ -15,6 +15,7 @@ import { CreateBookmarkDto } from './dto/create-bookmark.dto';
 import { UpdateBookmarkDto } from './dto/update-bookmark.dto';
 import { AccessTokenGuard } from 'src/auth/guards/accessToken.guard';
 import { Request } from 'express';
+import { PostEntity } from 'src/posts/entities/post.entity';
 
 @Controller('bookmarks')
 export class BookmarksController {
@@ -29,9 +30,10 @@ export class BookmarksController {
 
   @UseGuards(AccessTokenGuard)
   @Get()
-  findAll(@Req() req: Request) {
+  async findAll(@Req() req: Request) {
     const userId = req.user['sub'].id;
-    return this.bookmarksService.findAll(userId);
+    const bookmarks = await this.bookmarksService.findAll(userId);
+    return bookmarks.map(({ post }) => new PostEntity({ userId, post }));
   }
 
   @UseGuards(AccessTokenGuard)

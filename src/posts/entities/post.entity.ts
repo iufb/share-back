@@ -53,9 +53,8 @@ export class PostEntity {
       } else {
         this.isLiked = !!likes.find((like) => like.userId === userId);
       }
-      console.log(bookmarks, data.id);
 
-      if (bookmarks.length == 0) {
+      if (!bookmarks) {
         this.bookmarked = false;
       } else {
         this.bookmarked = !!bookmarks.find((b) => b.userId === userId);

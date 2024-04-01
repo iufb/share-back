@@ -3,6 +3,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { USER_EXISTS } from './users.constants';
+import { CreateFollowDto } from 'src/users/dto/create-follow.dto';
 
 @Injectable()
 export class UsersService {
@@ -16,6 +17,7 @@ export class UsersService {
     }
     return this.prisma.user.create({ data: createUserDto });
   }
+  async createFollow(createFollowDto: CreateFollowDto) {}
 
   findAll() {
     return this.prisma.user.findMany();
